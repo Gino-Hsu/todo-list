@@ -1,8 +1,14 @@
 const express = require('express')
 const mongoose = require('mongoose')
 
+const exphbs = require('express-handlebars')
+
 const app = express()
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+
+// 建立一個名為 hbs 的樣板引擎，並傳入 exphbs 與相關參數
+app.engine('hbs', exphbs({ defaultLayouts: 'main', extname: '.hbs' }))
+app.set('view engine', 'hbs')
 
 // 取得資料庫連線狀態
 const db = mongoose.connection
@@ -16,7 +22,7 @@ db.once('open', () => {
 })
 
 app.get('/', (req, res) => {
-  res.send('hello word!')
+  res.render('index')
 })
 
 app.listen(3000, () => {
