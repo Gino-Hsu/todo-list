@@ -6,6 +6,8 @@ const methodOverride = require('method-override') // 引用 metnod-override
 
 
 const routes = require('./routes')
+
+const usePassport = require('./config/passport')
 require('./config/mongoose')
 
 const app = express()
@@ -14,13 +16,9 @@ const app = express()
 const PORT = process.env.PORT || 3000
 
 // 載入設定檔，要寫在 express-session 以後
-const usePassport = require('./config/passport')
 // 建立一個名為 hbs 的樣板引擎，並傳入 exphbs 與相關參數
 app.engine('hbs', exphbs({ defaultLayouts: 'main', extname: '.hbs' }))
 app.set('view engine', 'hbs')
-
-// 呼叫 Passport 函式並傳入 app，這條要寫在路由之前
-usePassport(app)
 
 app.use(session({
   secret: 'ThisIsMySecret',
@@ -31,6 +29,16 @@ app.use(session({
 app.use(bodyParser.urlencoded({ extended: true }))
 // 設定每一筆請求都會透過 methodOverride 進行前置處理
 app.use(methodOverride('_method'))
+
+// 呼叫 Passport 函式並傳入 app，這條要寫在路由之前
+usePassport(app)
+
+app.use((req, res, next) => {
+  // 你可以在這裡 console.log(req.user) 等資訊來觀察
+  res.locals.isAuthenticated = req.isAuthenticated()
+  res.locals.user = req.user
+  next()
+})
 
 // 將 request 導入路由器
 app.use(routes)
