@@ -8,6 +8,12 @@ const todoSchema = new Schema({
   isDone: {
     type: Boolean,
     required: false // 預設狀態為 false
+  },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    index: true,
+    required: true
   }
 })
 module.exports = mongoose.model('Todo', todoSchema)
